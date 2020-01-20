@@ -20,7 +20,7 @@ func fuel(m int) int {
 }
 
 func main() {
-	input, err := ioutil.ReadFile("day1/day2.input.txt")
+	input, err := ioutil.ReadFile("day1/day1.input.txt")
 	if err != nil {
 		panic(err)
 	}
