@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func CountDigits(i int64) (count int64) {
@@ -153,11 +154,26 @@ func createComputer(intcodes *[]int64, cin, cfinished chan int64, phaseSetting i
 	return cout
 }
 
-func setPannelColor(panelGridPtr *[][]int, robotLocationPtr *[]int, color int) *[][]int {
+func panelNotChangedBefore(panelsChangedPtr *[][]int, thisPanelPtr *[]int) bool{
+	panelsChanged := *panelsChangedPtr
+	thisPanel := *thisPanelPtr
+	for _,panel := range panelsChanged {
+		if panel[0] == thisPanel[0] && panel[1] == thisPanel[1] {
+			return false
+		}
+	}
+	return true
+}
+
+func setPanelColor(panelsChangedPtr *[][]int, panelGridPtr *[][]int, robotLocationPtr *[]int, color int) (*[][]int, *[][]int) {
+	panelsChanged := *panelsChangedPtr
 	robotLocation := *robotLocationPtr
 	panelGrid := *panelGridPtr
-	panelGrid[robotLocation[0]][robotLocation[1]] = color
-	return &panelGrid
+	panelGrid[robotLocation[1]][robotLocation[0]] = color
+	if panelNotChangedBefore(panelsChangedPtr, robotLocationPtr){
+		panelsChanged = append(panelsChanged, []int{robotLocation[0], robotLocation[1]})
+	}
+	return &panelGrid, &panelsChanged
 }
 
 func moveRobot(robotLocationPtr *[]int, currentDirection int, newDirection int) (int, *[]int) {
@@ -169,7 +185,7 @@ func moveRobot(robotLocationPtr *[]int, currentDirection int, newDirection int) 
 	case 1: // right
 		robotDirection++
 	default:
-		panic(fmt.Sprintf("Direction %s is not recognized", newDirection))
+		panic(fmt.Sprintf("Direction %d is not recognized", newDirection))
 	}
 	if robotDirection < 0 {
 		robotDirection = 3
@@ -188,7 +204,7 @@ func moveRobot(robotLocationPtr *[]int, currentDirection int, newDirection int) 
 	case 3: // 3 = left
 		robotLocation[0]--
 	default:
-		panic(fmt.Sprintf("robotDirection %s is not recognized", newDirection))
+		panic(fmt.Sprintf("robotDirection %d is not recognized", newDirection))
 	}
 
 	return robotDirection, &robotLocation
@@ -198,27 +214,47 @@ func moveRobot(robotLocationPtr *[]int, currentDirection int, newDirection int) 
 func checkColor(panelGridPtr *[][]int, robotLocationPtr *[]int) int {
 	robotLocation := *robotLocationPtr
 	panelGrid := *panelGridPtr
-	retVal := panelGrid[robotLocation[0]][robotLocation[1]]
+	retVal := panelGrid[robotLocation[1]][robotLocation[0]]
 	return retVal
 }
 
-func printPanels(panelGridPtr *[][]int, robotLocationPtr *[]int) { // TODO: put this somewhere and add pause between painting
+func printPanels(panelGridPtr *[][]int, robotLocationPtr *[]int, robotDirection int) { // TODO: put this somewhere and add pause between painting
 	robotLocation := *robotLocationPtr
 	panelGrid := *panelGridPtr
+	robotDirectionChar := 0x52 // "R"
+	switch robotDirection {
+		case 0: // "Up"
+			robotDirectionChar = 0x5E // "^"
+		case 1: // "Right"
+			robotDirectionChar = 0x3E // ">"
+		case 2: // "Down"
+			robotDirectionChar = 0x76 // "v"
+		case 3: // "Left"
+			robotDirectionChar = 0x3C // "<"		
+	}
 	for y, panelRow := range panelGrid {
 		for x, panel := range panelRow {
 			if x == robotLocation[0] && y == robotLocation[1] {
-				fmt.Printf("R")
+				fmt.Printf("%c", robotDirectionChar)
 			} else {
-				fmt.Printf("%d", panel)
+				if panel == 0 {
+					fmt.Printf(".")
+				}else{
+					fmt.Printf("#")
+				}
 			}
 		}
 		fmt.Println()
 	}
 }
 
+func pause(seconds int) {
+	duration := time.Second*time.Duration(seconds)
+	time.Sleep(duration)
+}
+
 func createPainterController(numAmps int, cfirstinput, clastoutput, cfinished chan int64, ccontrollerFinished chan bool) {
-	cfirstinput <- 0 // TODO: comment out if not inputting to program
+	cfirstinput <- 1 // TODO: comment out if not inputting to program
 	var lastOut int64
 	outputCounter := 0
 	output := make([]int64, 2)
@@ -230,7 +266,9 @@ func createPainterController(numAmps int, cfirstinput, clastoutput, cfinished ch
 			panelGrid[i][j] = 0
 		}
 	}
+	panelsChangedGrid := [][]int{}
 	robotLocation := []int{panelGridWidth / 2, panelGridWidth / 2} // x,y
+	panelGrid[robotLocation[1]][robotLocation[0]] = 1 // set first place robot to white
 	var robotLocationPtr *[]int
 	robotDirection := 0 // 0 = up; 1 = right; 2 = down; 3 = left
 	for {
@@ -242,12 +280,15 @@ func createPainterController(numAmps int, cfirstinput, clastoutput, cfinished ch
 			outputCounter++
 			if outputCounter > 1 {
 				outputCounter = 0
-				setPannelColor(&panelGrid, &robotLocation, int(output[0]))
+				_,panelsChangedGridPtr := setPanelColor(&panelsChangedGrid, &panelGrid, &robotLocation, int(output[0]))
+				panelsChangedGrid = *panelsChangedGridPtr
+				fmt.Printf("Panels Painted: %d", len(panelsChangedGrid))
 				robotDirection, robotLocationPtr = moveRobot(&robotLocation, robotDirection, int(output[1]))
 				robotLocation = *robotLocationPtr
 				cfirstinput <- int64(checkColor(&panelGrid, &robotLocation))
-				fmt.Println()
+				printPanels(&panelGrid, &robotLocation, robotDirection)
 			}
+			//pause(1)
 		case computerFinished := <-cfinished:
 			fmt.Printf("Computer %d finished\n", computerFinished)
 			ccontrollerFinished <- true
@@ -257,7 +298,7 @@ func createPainterController(numAmps int, cfirstinput, clastoutput, cfinished ch
 }
 
 func runProgram(program *[]int64, intcodes *[]int64, relativeBase int64) bool {
-	// Create a goroutine and an input & output channel for each amplifier
+	// Create a goroutine and an input & output chanel for each amplifier
 	numComputers := len(*program)
 	cin := make(chan int64)
 	cout := cin
