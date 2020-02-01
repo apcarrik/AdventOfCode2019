@@ -72,12 +72,15 @@ func applyGravity(moonsPtr *[]moon) *[]moon {
 	return &moons
 }
 
+func applyVelocity(moonsPtr *[]moon) *[]moon {
+	// TODO: implement
+	return moonsPtr
+}
+
 func runTimeStep(moonsPtr *[]moon) *[]moon {
-	moons := *moonsPtr
-	// Apply gravity
-	applyGravity(&moons)
-	// TODO: Apply velocity
-	return &moons
+	moonsPtr = applyGravity(moonsPtr)
+	moonsPtr = applyVelocity(moonsPtr)
+	return 	moonsPtr
 }
 
 func nBodyProblem(file string, numSteps int) int {
