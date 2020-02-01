@@ -64,8 +64,6 @@ func applyGravity(moonsPtr *[]moon) *[]moon {
 					moons[i].vz -=1
 				}
 				fmt.Printf("")
-			} else {
-				// fmt.Printf("duplicate: %v == %v\n", &moon1, &moon2)
 			}
 		}
 	}
