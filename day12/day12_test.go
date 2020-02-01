@@ -5,7 +5,7 @@ import (
 	"reflect"
 )
 
-func TestParseInput(t *testing.T) {
+func TestUnittestParseInput(t *testing.T) {
 	expectedResult := []moon{
 		moon{x:-3, y:15, z:-11, vx:0, vy:0, vz:0},
 		moon{x:3, y:13, z:-19, vx:0, vy:0, vz:0},
