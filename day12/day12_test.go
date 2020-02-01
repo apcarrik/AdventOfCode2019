@@ -19,7 +19,7 @@ func TestUnittest_parseInput(t *testing.T) {
 	}
 }
 
-func TestUnittest_runTimeStep(t *testing.T) {
+func TestUnittest_applyGravity(t *testing.T) {
 	expectedResult := []moon{
 		moon{x:-1, y:0, z:2, vx:3, vy:-1, vz:-1},
 		moon{x:2, y:-10, z:-7, vx:1, vy:3, vz:3},
@@ -32,7 +32,7 @@ func TestUnittest_runTimeStep(t *testing.T) {
 		moon{x:4, y:-8, z:8, vx:0, vy:0, vz:0},
 		moon{x:3, y:5, z:-1, vx:0, vy:0, vz:0},
 	}
-	actualResult := runTimeStep(&inputMoons)
+	actualResult := applyGravity(&inputMoons)
 	if !reflect.DeepEqual(*actualResult, expectedResult) {
 		t.Errorf("Expected result was %v, actual result was %v\n", expectedResult, actualResult)
 	}

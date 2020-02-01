@@ -39,7 +39,7 @@ func parseInput(inputPtr *[]byte) *[]moon {
 	return &moons
 }
 
-func runTimeStep(moonsPtr *[]moon) *[]moon {
+func applyGravity(moonsPtr *[]moon) *[]moon {
 	moons := *moonsPtr
 	// Apply gravity
 	for i,moon1 := range moons {
@@ -69,6 +69,13 @@ func runTimeStep(moonsPtr *[]moon) *[]moon {
 			}
 		}
 	}
+	return &moons
+}
+
+func runTimeStep(moonsPtr *[]moon) *[]moon {
+	moons := *moonsPtr
+	// Apply gravity
+	applyGravity(&moons)
 	// TODO: Apply velocity
 	return &moons
 }
