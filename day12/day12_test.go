@@ -76,7 +76,9 @@ func TestUnittest_runTimeStep(t *testing.T) {
 	}
 }
 
-
+func TestIntegration_runTimeStep(t *testing.T) {
+	// TODO - implement. Look at examples in instructions and get runTimeStep to match for different iterations
+}
 
 func TestResultInput(t *testing.T) {
 	inputFile := "input.txt"
