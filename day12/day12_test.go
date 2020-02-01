@@ -5,7 +5,7 @@ import (
 	"reflect"
 )
 
-func TestUnittestParseInput(t *testing.T) {
+func TestUnittest_parseInput(t *testing.T) {
 	expectedResult := []moon{
 		moon{x:-3, y:15, z:-11, vx:0, vy:0, vz:0},
 		moon{x:3, y:13, z:-19, vx:0, vy:0, vz:0},
@@ -18,6 +18,27 @@ func TestUnittestParseInput(t *testing.T) {
 		t.Errorf("Expected result was %v, actual result was %v\n", expectedResult, actualResult)
 	}
 }
+
+func TestUnittest_runTimeStep(t *testing.T) {
+	expectedResult := []moon{
+		moon{x:-1, y:0, z:2, vx:3, vy:-1, vz:-1},
+		moon{x:2, y:-10, z:-7, vx:1, vy:3, vz:3},
+		moon{x:4, y:-8, z:8, vx:-3, vy:1, vz:-3},
+		moon{x:3, y:5, z:-1, vx:-1, vy:-3, vz:1},
+	}
+	inputMoons := []moon{
+		moon{x:-1, y:0, z:2, vx:0, vy:0, vz:0},
+		moon{x:2, y:-10, z:-7, vx:0, vy:0, vz:0},
+		moon{x:4, y:-8, z:8, vx:0, vy:0, vz:0},
+		moon{x:3, y:5, z:-1, vx:0, vy:0, vz:0},
+	}
+	actualResult := runTimeStep(&inputMoons)
+	if !reflect.DeepEqual(*actualResult, expectedResult) {
+		t.Errorf("Expected result was %v, actual result was %v\n", expectedResult, actualResult)
+	}
+}
+
+
 
 func TestResultInput(t *testing.T) {
 	inputFile := "input.txt"

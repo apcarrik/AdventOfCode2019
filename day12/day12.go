@@ -39,38 +39,39 @@ func parseInput(inputPtr *[]byte) *[]moon {
 	return &moons
 }
 
-// func runTimeStep(moonsPtr *[]moon) *[]moon {
-// 	moons := *moonsPtr
-// 	// Apply gravity
-// 	for _,moon1 := range moons {
-// 		for _,moon2 := range moons {
-// 			if moon1 != moon2 {
-// 				// Update vx
-// 				if moon1.x < moon2.x {
-// 					moon1.vx +=1
-// 				} else if moon1.x < moon2.x {
-// 					moon1.vx -=1
-// 				}
-// 				// Update vy
-// 				if moon1.y < moon2.y {
-// 					moon1.vy +=1
-// 				} else if moon1.y < moon2.y {
-// 					moon1.vy -=1
-// 				}
-// 				// Update vz
-// 				if moon1.z < moon2.z {
-// 					moon1.vz +=1
-// 				} else if moon1.z < moon2.z {
-// 					moon1.vz -=1
-// 				}
-// 			} else {
-// 				fmt.Printf("duplicate: %v == %v\n", &moon1, &moon2)
-// 			}
-// 		}
-// 	}
-// 	// TODO: Apply velocity
-// 	return &moons
-// }
+func runTimeStep(moonsPtr *[]moon) *[]moon {
+	moons := *moonsPtr
+	// Apply gravity
+	for i,moon1 := range moons {
+		for _,moon2 := range moons {
+			if moon1 != moon2 {
+				// Update vx
+				if moon1.x < moon2.x {
+					moons[i].vx +=1
+				} else if moon1.x > moon2.x {
+					moons[i].vx -=1
+				}
+				// Update vy
+				if moon1.y < moon2.y {
+					moons[i].vy +=1
+				} else if moon1.y > moon2.y {
+					moons[i].vy -=1
+				}
+				// Update vz
+				if moon1.z < moon2.z {
+					moons[i].vz +=1
+				} else if moon1.z > moon2.z {
+					moons[i].vz -=1
+				}
+				fmt.Printf("")
+			} else {
+				// fmt.Printf("duplicate: %v == %v\n", &moon1, &moon2)
+			}
+		}
+	}
+	// TODO: Apply velocity
+	return &moons
+}
 
 func nBodyProblem(file string, numSteps int) int {
 	input, err := ioutil.ReadFile(file)
@@ -79,13 +80,13 @@ func nBodyProblem(file string, numSteps int) int {
 	}
 	// Get moons from input file
 	moons := *parseInput(&input)
-	fmt.Printf("moons: %v\n", moons)
 
-	// TODO: Update moons for number of steps
-	// for i:=0; i<numSteps; i++ {		
-	// 	updatedMoonsPtr := runTimeStep(&moons)
-	// 	moons := *updatedMoonsPtr
-	// }
+	// Update moons for number of steps
+	for i:=0; i<numSteps; i++ {		
+		updatedMoonsPtr := runTimeStep(&moons)
+		moons = *updatedMoonsPtr		
+	}
+	fmt.Printf("moons: %v\n", moons)
 
 	// TODO: Calculate total energy of system
 	return 0
