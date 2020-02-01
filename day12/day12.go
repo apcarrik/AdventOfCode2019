@@ -71,8 +71,18 @@ func applyGravity(moonsPtr *[]moon) *[]moon {
 }
 
 func applyVelocity(moonsPtr *[]moon) *[]moon {
-	// TODO: implement
-	return moonsPtr
+	moons := *moonsPtr
+	// Apply velocity
+	for i,_ := range moons {
+		// Update x
+		moons[i].x += moons[i].vx
+		// Update y
+		moons[i].y += moons[i].vy
+		// Update z
+		moons[i].z += moons[i].vz
+		fmt.Printf("")
+	}
+	return &moons
 }
 
 func runTimeStep(moonsPtr *[]moon) *[]moon {
