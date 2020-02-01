@@ -39,11 +39,60 @@ func parseInput(inputPtr *[]byte) *[]moon {
 	return &moons
 }
 
-func main() {
-	input, err := ioutil.ReadFile("input.txt")
+// func runTimeStep(moonsPtr *[]moon) *[]moon {
+// 	moons := *moonsPtr
+// 	// Apply gravity
+// 	for _,moon1 := range moons {
+// 		for _,moon2 := range moons {
+// 			if moon1 != moon2 {
+// 				// Update vx
+// 				if moon1.x < moon2.x {
+// 					moon1.vx +=1
+// 				} else if moon1.x < moon2.x {
+// 					moon1.vx -=1
+// 				}
+// 				// Update vy
+// 				if moon1.y < moon2.y {
+// 					moon1.vy +=1
+// 				} else if moon1.y < moon2.y {
+// 					moon1.vy -=1
+// 				}
+// 				// Update vz
+// 				if moon1.z < moon2.z {
+// 					moon1.vz +=1
+// 				} else if moon1.z < moon2.z {
+// 					moon1.vz -=1
+// 				}
+// 			} else {
+// 				fmt.Printf("duplicate: %v == %v\n", &moon1, &moon2)
+// 			}
+// 		}
+// 	}
+// 	// TODO: Apply velocity
+// 	return &moons
+// }
+
+func nBodyProblem(file string, numSteps int) int {
+	input, err := ioutil.ReadFile(file)
 	if err != nil {
 		panic(err)
 	}
+	// Get moons from input file
 	moons := *parseInput(&input)
-	fmt.Printf("%v", moons)
+	fmt.Printf("moons: %v\n", moons)
+
+	// TODO: Update moons for number of steps
+	// for i:=0; i<numSteps; i++ {		
+	// 	updatedMoonsPtr := runTimeStep(&moons)
+	// 	moons := *updatedMoonsPtr
+	// }
+
+	// TODO: Calculate total energy of system
+	return 0
+}
+
+func main() {
+	numSteps := 1000
+	totalEnergy := nBodyProblem("input.txt", numSteps)
+	fmt.Printf("Total energy of system after %d steps: %d", numSteps, totalEnergy)
 }
