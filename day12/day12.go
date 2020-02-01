@@ -41,7 +41,6 @@ func parseInput(inputPtr *[]byte) *[]moon {
 
 func applyGravity(moonsPtr *[]moon) *[]moon {
 	moons := *moonsPtr
-	// Apply gravity
 	for i,moon1 := range moons {
 		for _,moon2 := range moons {
 			if moon1 != moon2 {
@@ -71,7 +70,6 @@ func applyGravity(moonsPtr *[]moon) *[]moon {
 
 func applyVelocity(moonsPtr *[]moon) *[]moon {
 	moons := *moonsPtr
-	// Apply velocity
 	for i,_ := range moons {
 		// Update x
 		moons[i].x += moons[i].vx
