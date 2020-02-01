@@ -59,10 +59,10 @@ func TestUnittest_applyVelocity(t *testing.T) {
 
 func TestUnittest_runTimeStep(t *testing.T) {
 	expectedResult := []moon{
-		moon{x:-1, y:0, z:2, vx:3, vy:-1, vz:-1},
-		moon{x:2, y:-10, z:-7, vx:1, vy:3, vz:3},
-		moon{x:4, y:-8, z:8, vx:-3, vy:1, vz:-3},
-		moon{x:3, y:5, z:-1, vx:-1, vy:-3, vz:1},
+		moon{x:2, y:-1, z:1, vx:3, vy:-1, vz:-1},
+		moon{x:3, y:-7, z:-4, vx:1, vy:3, vz:3},
+		moon{x:1, y:-7, z:5, vx:-3, vy:1, vz:-3},
+		moon{x:2, y:2, z:0, vx:-1, vy:-3, vz:1},
 	}
 	inputMoons := []moon{
 		moon{x:-1, y:0, z:2, vx:0, vy:0, vz:0},
