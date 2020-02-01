@@ -63,7 +63,6 @@ func applyGravity(moonsPtr *[]moon) *[]moon {
 				} else if moon1.z > moon2.z {
 					moons[i].vz -=1
 				}
-				fmt.Printf("")
 			}
 		}
 	}
@@ -80,7 +79,6 @@ func applyVelocity(moonsPtr *[]moon) *[]moon {
 		moons[i].y += moons[i].vy
 		// Update z
 		moons[i].z += moons[i].vz
-		fmt.Printf("")
 	}
 	return &moons
 }
