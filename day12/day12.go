@@ -130,5 +130,5 @@ func nBodyProblem(file string, numSteps int) int {
 func main() {
 	numSteps := 1000
 	totalEnergy := nBodyProblem("input.txt", numSteps)
-	fmt.Printf("Total energy of system after %d steps: %d", numSteps, totalEnergy)
+	fmt.Printf("Total energy of system after %d steps: %d\n", numSteps, totalEnergy)
 }
