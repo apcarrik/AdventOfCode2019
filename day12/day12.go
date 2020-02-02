@@ -120,7 +120,6 @@ func nBodyProblem(file string, numSteps int) int {
 		updatedMoonsPtr := runTimeStep(&moons)
 		moons = *updatedMoonsPtr		
 	}
-	fmt.Printf("moons: %v\n", moons)
 
 	// Calculate total energy of system
 	totalSystemEnergy := calculateSystemEnergy(&moons)
