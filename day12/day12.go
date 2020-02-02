@@ -19,7 +19,10 @@ type moon struct {
 func parseInput(inputPtr *[]byte) *[]moon {
 	input := *inputPtr
 	moons := []moon{}
-	re := regexp.MustCompile(`<x=(?P<x>-?\d+), y=(?P<y>-?\d+), z=(?P<z>-?\d+)>`) //<x=-3, y=15, z=-11>
+	re, err := regexp.Compile(`<x=(?P<x>-?\d+), y=(?P<y>-?\d+), z=(?P<z>-?\d+)>`) //<x=-3, y=15, z=-11>
+	if err != nil {
+		panic(err)
+	}
 	for _, j := range re.FindAllSubmatch(input, -1) {
 		xint, err := strconv.Atoi(string(j[1]))
 		if err != nil {
