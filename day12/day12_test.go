@@ -6,13 +6,13 @@ import (
 	"reflect"
 	"regexp"
 	"strconv"
+	"fmt"
 )
 
 func parseTestInput(inputPtr *[]byte) *[]moon {
 	input := *inputPtr
-	moons := []moon{}
-	// re := regexp.MustCompile(`<x=(?P<x>-?\d+), y=(?P<y>-?\d+), z=(?P<z>-?\d+)>`) //<x=-3, y=15, z=-11>
-	re, err := regexp.Compile(`pos=<x=(?P<x>-?\d+), y=(?P<y>-?\d+), z=(?P<z>-?\d+)>, vel=<x=(?P<x>-?\d+), y=(?P<y>-?\d+), z=(?P<z>-?\d+)>`) //pos=<x= 2, y=-1, z= 1>, vel=<x= 3, y=-1, z=-1>
+	moons := []moon{} //pos=<x= 2, y=-1, z= 1>, vel=<x= 3, y=-1, z=-1>
+	re, err := regexp.Compile(`pos=<x=\s*(?P<x>-?\d+), y=\s*(?P<y>-?\d+), z=\s*(?P<z>-?\d+)>, vel=<x=\s*(?P<vx>-?\d+), y=\s*(?P<vy>-?\d+), z=\s*(?P<vz>-?\d+)>`) //pos=<x= 2, y=-1, z= 1>, vel=<x= 3, y=-1, z=-1>
 	if err != nil {
 		panic(err)
 	}
@@ -119,31 +119,28 @@ func TestUnittest_runTimeStep(t *testing.T) {
 }
 
 func TestIntegration_runTimeStep(t *testing.T) {
-	// TODO - implement. Look at examples in instructions and get runTimeStep to match for different iterations
+	for i:=0; i<10; i++ {
+		// Read input2 step i
+		input, err := ioutil.ReadFile(fmt.Sprintf("input2.step%d.txt", i))
+		if err != nil {
+			panic(err)
+		}
+		moonsInitialStep := *parseTestInput(&input)
 
-	// Read input2 step 0
-	input, err := ioutil.ReadFile("input2.step0.txt")
-	if err != nil {
-		panic(err)
+		// Read input2 step i+1
+		input, err = ioutil.ReadFile(fmt.Sprintf("input2.step%d.txt", i+1))
+		if err != nil {
+			panic(err)
+		}
+		moonsFinalStepExpected := *parseTestInput(&input)
+
+		// TODO: step throgh steps of program testing to see if you get same result
+		moonsFinalStepActual := runTimeStep(&moonsInitialStep)	
+		if !reflect.DeepEqual(*moonsFinalStepActual, moonsFinalStepExpected) {
+			t.Errorf("Run %d - Expected result was %v, actual result was %v\n", i, moonsFinalStepExpected, moonsFinalStepActual)
+		}
+
 	}
-	// Get moons from input file
-	moonsStep0 := *parseInput(&input)
-
-	// Read input2 step 1
-	input, err = ioutil.ReadFile("input2.step1.txt")
-	if err != nil {
-		panic(err)
-	}
-	// Get moons from input file
-	moonsStep1Expected := *parseInput(&input)
-
-	// TODO: step throgh steps of program testing to see if you get same result
-	moonsStep1Actual := runTimeStep(&moonsStep0)	
-	if !reflect.DeepEqual(*moonsStep1Actual, moonsStep1Expected) {
-		t.Errorf("Expected result was %v, actual result was %v\n", moonsStep1Expected, moonsStep1Actual)
-	}
-
-
 }
 
 func TestResultInput(t *testing.T) {
