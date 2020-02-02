@@ -11,8 +11,8 @@ import (
 
 func parseTestInput(inputPtr *[]byte) *[]moon {
 	input := *inputPtr
-	moons := []moon{} //pos=<x= 2, y=-1, z= 1>, vel=<x= 3, y=-1, z=-1>
-	re, err := regexp.Compile(`pos=<x=\s*(?P<x>-?\d+), y=\s*(?P<y>-?\d+), z=\s*(?P<z>-?\d+)>, vel=<x=\s*(?P<vx>-?\d+), y=\s*(?P<vy>-?\d+), z=\s*(?P<vz>-?\d+)>`) //pos=<x= 2, y=-1, z= 1>, vel=<x= 3, y=-1, z=-1>
+	moons := []moon{}
+	re, err := regexp.Compile(`pos=<x=\s*(?P<x>-?\d+), y=\s*(?P<y>-?\d+), z=\s*(?P<z>-?\d+)>, vel=<x=\s*(?P<vx>-?\d+), y=\s*(?P<vy>-?\d+), z=\s*(?P<vz>-?\d+)>`)
 	if err != nil {
 		panic(err)
 	}
@@ -120,21 +120,21 @@ func TestUnittest_runTimeStep(t *testing.T) {
 
 func TestIntegration_runTimeStep(t *testing.T) {
 	for i:=0; i<10; i++ {
-		// Read input2 step i
+		// Read input - step i
 		input, err := ioutil.ReadFile(fmt.Sprintf("input2.step%d.txt", i))
 		if err != nil {
 			panic(err)
 		}
 		moonsInitialStep := *parseTestInput(&input)
 
-		// Read input2 step i+1
+		// Read input - step i+1
 		input, err = ioutil.ReadFile(fmt.Sprintf("input2.step%d.txt", i+1))
 		if err != nil {
 			panic(err)
 		}
-		moonsFinalStepExpected := *parseTestInput(&input)
 
-		// TODO: step throgh steps of program testing to see if you get same result
+		// Compare expected moons to actual
+		moonsFinalStepExpected := *parseTestInput(&input)
 		moonsFinalStepActual := runTimeStep(&moonsInitialStep)	
 		if !reflect.DeepEqual(*moonsFinalStepActual, moonsFinalStepExpected) {
 			t.Errorf("Run %d - Expected result was %v, actual result was %v\n", i, moonsFinalStepExpected, moonsFinalStepActual)
