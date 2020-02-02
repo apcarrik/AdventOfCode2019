@@ -2,8 +2,50 @@ package main
 
 import (
 	"testing"
+	"io/ioutil"
 	"reflect"
+	"regexp"
+	"strconv"
 )
+
+func parseTestInput(inputPtr *[]byte) *[]moon {
+	input := *inputPtr
+	moons := []moon{}
+	// re := regexp.MustCompile(`<x=(?P<x>-?\d+), y=(?P<y>-?\d+), z=(?P<z>-?\d+)>`) //<x=-3, y=15, z=-11>
+	re, err := regexp.Compile(`pos=<x=(?P<x>-?\d+), y=(?P<y>-?\d+), z=(?P<z>-?\d+)>, vel=<x=(?P<x>-?\d+), y=(?P<y>-?\d+), z=(?P<z>-?\d+)>`) //pos=<x= 2, y=-1, z= 1>, vel=<x= 3, y=-1, z=-1>
+	if err != nil {
+		panic(err)
+	}
+	for _, j := range re.FindAllSubmatch(input, -1) {
+		xint, err := strconv.Atoi(string(j[1]))
+		if err != nil {
+			panic(err)
+		}
+		yint, err := strconv.Atoi(string(j[2]))
+		if err != nil {
+			panic(err)
+		}
+		zint, err := strconv.Atoi(string(j[3]))
+		if err != nil {
+			panic(err)
+		}
+		vxint, err := strconv.Atoi(string(j[4]))
+		if err != nil {
+			panic(err)
+		}
+		vyint, err := strconv.Atoi(string(j[5]))
+		if err != nil {
+			panic(err)
+		}
+		vzint, err := strconv.Atoi(string(j[6]))
+		if err != nil {
+			panic(err)
+		}
+		newMoon := moon{x: xint, y: yint, z: zint, vx: vxint, vy: vyint, vz: vzint}
+		moons = append(moons, newMoon)
+	}
+	return &moons
+}
 
 func TestUnittest_parseInput(t *testing.T) {
 	expectedResult := []moon{
@@ -78,6 +120,30 @@ func TestUnittest_runTimeStep(t *testing.T) {
 
 func TestIntegration_runTimeStep(t *testing.T) {
 	// TODO - implement. Look at examples in instructions and get runTimeStep to match for different iterations
+
+	// Read input2 step 0
+	input, err := ioutil.ReadFile("input2.step0.txt")
+	if err != nil {
+		panic(err)
+	}
+	// Get moons from input file
+	moonsStep0 := *parseInput(&input)
+
+	// Read input2 step 1
+	input, err = ioutil.ReadFile("input2.step1.txt")
+	if err != nil {
+		panic(err)
+	}
+	// Get moons from input file
+	moonsStep1Expected := *parseInput(&input)
+
+	// TODO: step throgh steps of program testing to see if you get same result
+	moonsStep1Actual := runTimeStep(&moonsStep0)	
+	if !reflect.DeepEqual(*moonsStep1Actual, moonsStep1Expected) {
+		t.Errorf("Expected result was %v, actual result was %v\n", moonsStep1Expected, moonsStep1Actual)
+	}
+
+
 }
 
 func TestResultInput(t *testing.T) {
