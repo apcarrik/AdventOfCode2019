@@ -16,6 +16,13 @@ type moon struct {
 	vz int
 }
 
+func absoluteValue(i int) int {
+	if i<0 {
+		return -i
+	}
+	return i
+}
+
 func parseInput(inputPtr *[]byte) *[]moon {
 	input := *inputPtr
 	moons := []moon{}
@@ -90,12 +97,22 @@ func runTimeStep(moonsPtr *[]moon) *[]moon {
 	return 	moonsPtr
 }
 
+func calculateSystemEnergy(moonsPtr *[]moon) int {
+	moons := *moonsPtr
+	totalSystemEnergy := 0
+	for _,moon := range moons { // [						Potential Energy						  ]	  [								Kinetic energy 								]
+		totalSystemEnergy += int(absoluteValue(moon.x) + absoluteValue(moon.y) + absoluteValue(moon.z)) * (absoluteValue(moon.vx) + absoluteValue(moon.vy) + absoluteValue(moon.vz))
+	}
+	return totalSystemEnergy
+}
+
 func nBodyProblem(file string, numSteps int) int {
+
+	// Get moons from input file
 	input, err := ioutil.ReadFile(file)
 	if err != nil {
 		panic(err)
 	}
-	// Get moons from input file
 	moons := *parseInput(&input)
 
 	// Update moons for number of steps
@@ -105,8 +122,10 @@ func nBodyProblem(file string, numSteps int) int {
 	}
 	fmt.Printf("moons: %v\n", moons)
 
-	// TODO: Calculate total energy of system
-	return 0
+	// Calculate total energy of system
+	totalSystemEnergy := calculateSystemEnergy(&moons)
+
+	return totalSystemEnergy
 }
 
 func main() {

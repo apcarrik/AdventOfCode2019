@@ -155,8 +155,8 @@ func Test_EndToEnd_Input(t *testing.T) {
 
 func Test_EndToEnd_Input2(t *testing.T) {
 	inputFile := "input2.txt"
-	iterations := 1000
-	expectedResult := 0
+	iterations := 10
+	expectedResult := 179
 	actualResult := nBodyProblem(inputFile, iterations)
 	if actualResult != expectedResult {
 		t.Errorf("Expected result was %v, actual result was %v\n", expectedResult, actualResult)
