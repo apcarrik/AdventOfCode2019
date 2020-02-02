@@ -119,15 +119,17 @@ func Test_UnitTest_runTimeStep(t *testing.T) {
 }
 
 func Test_IntegrationTest_runTimeStep(t *testing.T) {
+
+	// Test input2 steps 0-10
 	for i:=0; i<10; i++ {
-		// Read input - step i
+		// Read input2 - step i
 		input, err := ioutil.ReadFile(fmt.Sprintf("input2.step%d.txt", i))
 		if err != nil {
 			panic(err)
 		}
 		moonsInitialStep := *parseTestInput(&input)
 
-		// Read input - step i+1
+		// Read input2 - step i+1
 		input, err = ioutil.ReadFile(fmt.Sprintf("input2.step%d.txt", i+1))
 		if err != nil {
 			panic(err)
@@ -137,7 +139,34 @@ func Test_IntegrationTest_runTimeStep(t *testing.T) {
 		moonsFinalStepExpected := *parseTestInput(&input)
 		moonsFinalStepActual := runTimeStep(&moonsInitialStep)	
 		if !reflect.DeepEqual(*moonsFinalStepActual, moonsFinalStepExpected) {
-			t.Errorf("Run %d - Expected result was %v, actual result was %v\n", i, moonsFinalStepExpected, moonsFinalStepActual)
+			t.Errorf("Input2, run %d - Expected result was %v, actual result was %v\n", i, moonsFinalStepExpected, moonsFinalStepActual)
+		}
+
+	}
+
+	// Test input3 steps 0-100 (increments of 10)
+	for i:=0; i<100; i+=10 {
+		// Read input2 - step i
+		input, err := ioutil.ReadFile(fmt.Sprintf("input3.step%d.txt", i))
+		if err != nil {
+			panic(err)
+		}
+		moonsInitialStep := *parseTestInput(&input)
+
+		// Read input2 - step i+1
+		input, err = ioutil.ReadFile(fmt.Sprintf("input3.step%d.txt", i+10))
+		if err != nil {
+			panic(err)
+		}
+
+		// Compare expected moons to actual
+		moonsFinalStepExpected := *parseTestInput(&input)
+		moonsFinalStepActualPtr := &moonsInitialStep
+		for j:=0; j<10; j++{
+			moonsFinalStepActualPtr = runTimeStep(moonsFinalStepActualPtr)
+		}	
+		if !reflect.DeepEqual(*moonsFinalStepActualPtr, moonsFinalStepExpected) {
+			t.Errorf("Input3, run %d - Expected result was %v, actual result was %v\n", i, moonsFinalStepExpected, *moonsFinalStepActualPtr)
 		}
 
 	}
@@ -146,7 +175,7 @@ func Test_IntegrationTest_runTimeStep(t *testing.T) {
 func Test_EndToEnd_Input(t *testing.T) {
 	inputFile := "input.txt"
 	iterations := 1000
-	expectedResult := 0
+	expectedResult := 12070
 	actualResult := nBodyProblem(inputFile, iterations)
 	if actualResult != expectedResult {
 		t.Errorf("Expected result was %v, actual result was %v\n", expectedResult, actualResult)
@@ -165,8 +194,8 @@ func Test_EndToEnd_Input2(t *testing.T) {
 
 func Test_EndToEnd_Input3(t *testing.T) {
 	inputFile := "input3.txt"
-	iterations := 1000
-	expectedResult := 0
+	iterations := 100
+	expectedResult := 1940
 	actualResult := nBodyProblem(inputFile, iterations)
 	if actualResult != expectedResult {
 		t.Errorf("Expected result was %v, actual result was %v\n", expectedResult, actualResult)
