@@ -47,7 +47,7 @@ func parseTestInput(inputPtr *[]byte) *[]moon {
 	return &moons
 }
 
-func TestUnittest_parseInput(t *testing.T) {
+func Test_UnitTest_parseInput(t *testing.T) {
 	expectedResult := []moon{
 		moon{x:-3, y:15, z:-11, vx:0, vy:0, vz:0},
 		moon{x:3, y:13, z:-19, vx:0, vy:0, vz:0},
@@ -61,7 +61,7 @@ func TestUnittest_parseInput(t *testing.T) {
 	}
 }
 
-func TestUnittest_applyGravity(t *testing.T) {
+func Test_UnitTest_applyGravity(t *testing.T) {
 	expectedResult := []moon{
 		moon{x:-1, y:0, z:2, vx:3, vy:-1, vz:-1},
 		moon{x:2, y:-10, z:-7, vx:1, vy:3, vz:3},
@@ -80,7 +80,7 @@ func TestUnittest_applyGravity(t *testing.T) {
 	}
 }
 
-func TestUnittest_applyVelocity(t *testing.T) {
+func Test_UnitTest_applyVelocity(t *testing.T) {
 	expectedResult := []moon{
 		moon{x:2, y:-1, z:1, vx:3, vy:-1, vz:-1},
 		moon{x:3, y:-7, z:-4, vx:1, vy:3, vz:3},
@@ -99,7 +99,7 @@ func TestUnittest_applyVelocity(t *testing.T) {
 	}
 }
 
-func TestUnittest_runTimeStep(t *testing.T) {
+func Test_UnitTest_runTimeStep(t *testing.T) {
 	expectedResult := []moon{
 		moon{x:2, y:-1, z:1, vx:3, vy:-1, vz:-1},
 		moon{x:3, y:-7, z:-4, vx:1, vy:3, vz:3},
@@ -118,7 +118,7 @@ func TestUnittest_runTimeStep(t *testing.T) {
 	}
 }
 
-func TestIntegration_runTimeStep(t *testing.T) {
+func Test_IntegrationTest_runTimeStep(t *testing.T) {
 	for i:=0; i<10; i++ {
 		// Read input - step i
 		input, err := ioutil.ReadFile(fmt.Sprintf("input2.step%d.txt", i))
@@ -143,7 +143,7 @@ func TestIntegration_runTimeStep(t *testing.T) {
 	}
 }
 
-func TestResultInput(t *testing.T) {
+func Test_EndToEnd_Input(t *testing.T) {
 	inputFile := "input.txt"
 	iterations := 1000
 	expectedResult := 0
@@ -153,7 +153,7 @@ func TestResultInput(t *testing.T) {
 	}
 }
 
-func TestResultInput2(t *testing.T) {
+func Test_EndToEnd_Input2(t *testing.T) {
 	inputFile := "input2.txt"
 	iterations := 1000
 	expectedResult := 0
@@ -163,7 +163,7 @@ func TestResultInput2(t *testing.T) {
 	}
 }
 
-func TestResultInput3(t *testing.T) {
+func Test_EndToEnd_Input3(t *testing.T) {
 	inputFile := "input3.txt"
 	iterations := 1000
 	expectedResult := 0
