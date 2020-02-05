@@ -178,8 +178,6 @@ What is the total energy in the system after simulating the moons given in your 
 
 Your puzzle answer was 12070.
 
-The first half of this puzzle is complete! It provides one gold star: *
-
 --- Part Two ---
 All this drifting around in space makes you wonder about the nature of the universe. Does history really repeat itself? You're curious whether the moons will ever return to a previous state.
 
@@ -219,3 +217,5 @@ Of course, the universe might last for a very long time before repeating. Here's
 This set of initial positions takes 4686774924 steps before it repeats a previous state! Clearly, you might need to find a more efficient way to simulate the universe.
 
 How many steps does it take to reach the first state that exactly matches a previous state?
+
+Your puzzle answer was 500903629351944.
