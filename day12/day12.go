@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"regexp"
 	"strconv"
+	"time"
 )
 
 type moon struct {
@@ -286,8 +287,11 @@ func nBodyProblemPart2(file string, maxSteps int) int {
 }
 
 func main() {
+	start := time.Now()
 	inputFile := "input.txt"
 	iterations := 4686774925
 	xResult := nBodyProblemPart2(inputFile, iterations)
 	fmt.Printf("xResult: %d/n", xResult)
+	elapsed := time.Since(start)
+	fmt.Printf("Program took %s", elapsed)
 }
