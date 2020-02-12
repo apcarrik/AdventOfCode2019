@@ -197,13 +197,38 @@ func updateGameBoard(drawInstructionsPtr *[3]int64, gameBoardPtr *[][]int, score
 	return &gameBoard, score
 }
 
-func artificalInputController(cinput chan int64) {
-	inputArr := []int64{-1, -1, -1, 1, 1, 1}
-	for {
-		for _, in := range inputArr {
-			cinput <- in
-			fmt.Printf("Inputted %d\n", in)
+func getObjectX(gameBoardPtr *[][]int, tileID int) (int, bool) {
+	// Get Object's x coordinate
+	gameBoard := *gameBoardPtr
+	for y := range gameBoard {
+		for x := range gameBoard[y] {
+			if gameBoard[y][x] == tileID {
+				return x, true
+			}
 		}
+	}
+	return 0, false
+}
+
+func getPaddleDirection(gameBoardPtr *[][]int) int {
+	// TODO: decide where to move the paddle, return -1 if left, 0 if no movement, 1 if right
+	ballX, ballFound := getObjectX(gameBoardPtr, 4)
+	paddleX, paddleFound := getObjectX(gameBoardPtr, 3)
+	if ballFound && paddleFound {
+		if ballX > paddleX {
+			return 1
+		} else if ballX < paddleX {
+			return -1
+		}
+	}
+	return 0
+}
+
+func artificalInputController(cinput chan int64, gameBoardPtr *[][]int) {
+	for { // TODO: figure out how to make this better (it is slow and laggy, don't know when it will ask for input but input may be stale at that point)
+		in := int64(getPaddleDirection(gameBoardPtr))
+		cinput <- in
+		fmt.Printf("Inputted %d\n", in)
 	}
 }
 
@@ -211,7 +236,6 @@ func createController(cfirstinput, clastoutput, cfinished chan int64, ccontrolle
 	// cfirstinput <- 1 // TODO: comment out if not inputting to program
 	var drawInstructions [3]int64
 	drawInstructionsIdx := 0
-	go artificalInputController(cfirstinput)
 	// Make game board
 	maxX := 45
 	maxY := 24
@@ -221,6 +245,7 @@ func createController(cfirstinput, clastoutput, cfinished chan int64, ccontrolle
 	}
 	gameBoardPtr := &gameBoard
 	score := 0
+	go artificalInputController(cfirstinput, gameBoardPtr)
 	for {
 		select {
 		case lastOut := <-clastoutput:
@@ -232,6 +257,7 @@ func createController(cfirstinput, clastoutput, cfinished chan int64, ccontrolle
 				drawGameBoard(gameBoardPtr)
 				fmt.Printf("Score: %d\n", score)
 				drawInstructionsIdx = 0
+				time.Sleep(5 * time.Millisecond)
 			}
 		case computerFinished := <-cfinished:
 			fmt.Printf("Computer %d finished\n", computerFinished)
