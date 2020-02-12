@@ -159,40 +159,57 @@ func pause(seconds int) {
 	time.Sleep(duration)
 }
 
-func checkIfBlockTile(drawInstructionsPtr *[3]int64) bool {
+func getMaxCoordinates(drawInstructionsPtr *[3]int64, maxX, maxY int) (int, int) {
 	drawInstructions := *drawInstructionsPtr
-	switch titleID := drawInstructions[2]; {
-	case titleID == 0: // empty tile
-	case titleID == 1: // wall tile
-	case titleID == 2: // block tile
-		return true
-	case titleID == 3: // horizontal paddle tile
-	case titleID == 4: // ball tile
+	tileX := int(drawInstructions[0])
+	tileY := int(drawInstructions[0])
+	switch tileID := drawInstructions[2]; {
+	case tileID == 0: // empty tile
+	case tileID == 1: // wall tile
+	case tileID == 2: // block tile
+	case tileID == 3: // horizontal paddle tile
+	case tileID == 4: // ball tile
 	default:
-		panic(fmt.Sprintf("Error: title id %d is not recognized\n", titleID))
+		panic(fmt.Sprintf("Error: title id %d is not recognized\n", tileID))
 	}
-	return false
+	if tileX > maxX {
+		maxX = tileX
+	}
+	if tileY > maxY {
+		maxY = tileY
+	}
+	return maxX, maxY
+}
+
+func artificalInputController(cinput chan int64) {
+	inputArr := []int64{-1, -1, -1, 0, 0, 0, 1, 1, 1}
+	for {
+		for _, in := range inputArr {
+			cinput <- in
+		}
+	}
 }
 
 func createController(cfirstinput, clastoutput, cfinished chan int64, ccontrollerFinished chan bool) {
 	// cfirstinput <- 1 // TODO: comment out if not inputting to program
 	var drawInstructions [3]int64
 	drawInstructionsIdx := 0
-	blockTileCounter := 0
+	// blockTileCounter := 0
+	go artificalInputController(cfirstinput)
+	maxX := 0
+	maxY := 0
 	for {
 		select {
 		case lastOut := <-clastoutput:
 			drawInstructions[drawInstructionsIdx] = lastOut
 			drawInstructionsIdx++
 			if drawInstructionsIdx > 2 {
-				if checkIfBlockTile(&drawInstructions) {
-					blockTileCounter++
-				}
+				maxX, maxY = getMaxCoordinates(&drawInstructions, maxX, maxY)
 				drawInstructionsIdx = 0
 			}
 		case computerFinished := <-cfinished:
 			fmt.Printf("Computer %d finished\n", computerFinished)
-			fmt.Printf("Number of Block Tiles: %d\n", blockTileCounter)
+			fmt.Printf("Max X: %d\tMax Y: %d\n", maxX, maxY)
 			ccontrollerFinished <- true
 			return
 		}
