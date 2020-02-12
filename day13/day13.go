@@ -159,26 +159,30 @@ func pause(seconds int) {
 	time.Sleep(duration)
 }
 
-func getMaxCoordinates(drawInstructionsPtr *[3]int64, maxX, maxY int) (int, int) {
+func getMaxCoordinates(drawInstructionsPtr *[3]int64, maxX, maxY, score int) (int, int, int) {
 	drawInstructions := *drawInstructionsPtr
 	tileX := int(drawInstructions[0])
-	tileY := int(drawInstructions[0])
-	switch tileID := drawInstructions[2]; {
-	case tileID == 0: // empty tile
-	case tileID == 1: // wall tile
-	case tileID == 2: // block tile
-	case tileID == 3: // horizontal paddle tile
-	case tileID == 4: // ball tile
-	default:
-		panic(fmt.Sprintf("Error: title id %d is not recognized\n", tileID))
+	tileY := int(drawInstructions[1])
+	if tileX == -1 && tileY == 0 { // Output Score
+		score = int(drawInstructions[1])
+	} else {
+		switch tileID := drawInstructions[2]; {
+		case tileID == 0: // empty tile
+		case tileID == 1: // wall tile
+		case tileID == 2: // block tile
+		case tileID == 3: // horizontal paddle tile
+		case tileID == 4: // ball tile
+		default:
+			panic(fmt.Sprintf("Error: title id %d is not recognized\n", tileID))
+		}
+		if tileX > maxX {
+			maxX = tileX
+		}
+		if tileY > maxY {
+			maxY = tileY
+		}
 	}
-	if tileX > maxX {
-		maxX = tileX
-	}
-	if tileY > maxY {
-		maxY = tileY
-	}
-	return maxX, maxY
+	return maxX, maxY, score
 }
 
 func artificalInputController(cinput chan int64) {
@@ -198,18 +202,19 @@ func createController(cfirstinput, clastoutput, cfinished chan int64, ccontrolle
 	go artificalInputController(cfirstinput)
 	maxX := 0
 	maxY := 0
+	score := 0
 	for {
 		select {
 		case lastOut := <-clastoutput:
 			drawInstructions[drawInstructionsIdx] = lastOut
 			drawInstructionsIdx++
 			if drawInstructionsIdx > 2 {
-				maxX, maxY = getMaxCoordinates(&drawInstructions, maxX, maxY)
+				maxX, maxY, score = getMaxCoordinates(&drawInstructions, maxX, maxY, score)
 				drawInstructionsIdx = 0
 			}
 		case computerFinished := <-cfinished:
 			fmt.Printf("Computer %d finished\n", computerFinished)
-			fmt.Printf("Max X: %d\tMax Y: %d\n", maxX, maxY)
+			fmt.Printf("Max X: %d\tMax Y: %d\tScore: %d\n", maxX, maxY, score)
 			ccontrollerFinished <- true
 			return
 		}
