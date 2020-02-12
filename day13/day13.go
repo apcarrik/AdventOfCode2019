@@ -159,37 +159,50 @@ func pause(seconds int) {
 	time.Sleep(duration)
 }
 
-func getMaxCoordinates(drawInstructionsPtr *[3]int64, maxX, maxY, score int) (int, int, int) {
+func drawGameBoard(gameBoardPtr *[][]int) {
+	gameBoard := *gameBoardPtr
+	for y := range gameBoard {
+		for x := range gameBoard[y] {
+			switch tileID := gameBoard[y][x]; {
+			case tileID == 0: // empty tile
+				fmt.Printf(" ")
+			case tileID == 1: // wall tile
+				fmt.Printf("🍞")
+			case tileID == 2: // block tile
+				fmt.Printf("🥑")
+			case tileID == 3: // horizontal paddle tile
+				fmt.Printf("▂")
+			case tileID == 4: // ball tile
+				fmt.Printf("⚽")
+			default:
+				panic(fmt.Sprintf("Error: title id %d is not recognized\n", tileID))
+			}
+		}
+		fmt.Printf("\n")
+	}
+
+}
+
+func updateGameBoard(drawInstructionsPtr *[3]int64, gameBoardPtr *[][]int, score int) (*[][]int, int) {
 	drawInstructions := *drawInstructionsPtr
+	gameBoard := *gameBoardPtr
 	tileX := int(drawInstructions[0])
 	tileY := int(drawInstructions[1])
+	tileID := int(drawInstructions[2])
 	if tileX == -1 && tileY == 0 { // Output Score
-		score = int(drawInstructions[1])
+		score = int(drawInstructions[2])
 	} else {
-		switch tileID := drawInstructions[2]; {
-		case tileID == 0: // empty tile
-		case tileID == 1: // wall tile
-		case tileID == 2: // block tile
-		case tileID == 3: // horizontal paddle tile
-		case tileID == 4: // ball tile
-		default:
-			panic(fmt.Sprintf("Error: title id %d is not recognized\n", tileID))
-		}
-		if tileX > maxX {
-			maxX = tileX
-		}
-		if tileY > maxY {
-			maxY = tileY
-		}
+		gameBoard[tileY][tileX] = tileID
 	}
-	return maxX, maxY, score
+	return &gameBoard, score
 }
 
 func artificalInputController(cinput chan int64) {
-	inputArr := []int64{-1, -1, -1, 0, 0, 0, 1, 1, 1}
+	inputArr := []int64{-1, -1, -1, 1, 1, 1}
 	for {
 		for _, in := range inputArr {
 			cinput <- in
+			fmt.Printf("Inputted %d\n", in)
 		}
 	}
 }
@@ -198,10 +211,15 @@ func createController(cfirstinput, clastoutput, cfinished chan int64, ccontrolle
 	// cfirstinput <- 1 // TODO: comment out if not inputting to program
 	var drawInstructions [3]int64
 	drawInstructionsIdx := 0
-	// blockTileCounter := 0
 	go artificalInputController(cfirstinput)
-	maxX := 0
-	maxY := 0
+	// Make game board
+	maxX := 45
+	maxY := 24
+	gameBoard := make([][]int, maxY)
+	for i := 0; i < maxY; i++ {
+		gameBoard[i] = make([]int, maxX)
+	}
+	gameBoardPtr := &gameBoard
 	score := 0
 	for {
 		select {
@@ -209,12 +227,15 @@ func createController(cfirstinput, clastoutput, cfinished chan int64, ccontrolle
 			drawInstructions[drawInstructionsIdx] = lastOut
 			drawInstructionsIdx++
 			if drawInstructionsIdx > 2 {
-				maxX, maxY, score = getMaxCoordinates(&drawInstructions, maxX, maxY, score)
+				gameBoardPtr, score = updateGameBoard(&drawInstructions, gameBoardPtr, score)
+				// gameBoard = *gameBoardPtr
+				drawGameBoard(gameBoardPtr)
+				fmt.Printf("Score: %d\n", score)
 				drawInstructionsIdx = 0
 			}
 		case computerFinished := <-cfinished:
 			fmt.Printf("Computer %d finished\n", computerFinished)
-			fmt.Printf("Max X: %d\tMax Y: %d\tScore: %d\n", maxX, maxY, score)
+			fmt.Printf("Score: %d\n", score)
 			ccontrollerFinished <- true
 			return
 		}
