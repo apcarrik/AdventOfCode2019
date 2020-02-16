@@ -78,6 +78,7 @@ func runOperations(orig_intcodes *[]int64, c1 chan int64, c2 chan int64, cfinish
 			parametersPtr := GetParameters(1, i, &parameterMode, &intcodes, relativeBase)
 			parameters := *parametersPtr
 			in := <-c1
+			// fmt.Printf("Input recieved: %v\n", in)
 			intcodes[parameters[0]] = in
 			i += 2
 		case 4: // output value
@@ -167,13 +168,13 @@ func drawGameBoard(gameBoardPtr *[][]int) {
 			case tileID == 0: // empty tile
 				fmt.Printf(" ")
 			case tileID == 1: // wall tile
-				fmt.Printf("🍞")
+				fmt.Printf("|")
 			case tileID == 2: // block tile
-				fmt.Printf("🥑")
+				fmt.Printf(".")
 			case tileID == 3: // horizontal paddle tile
-				fmt.Printf("▂")
+				fmt.Printf("_")
 			case tileID == 4: // ball tile
-				fmt.Printf("⚽")
+				fmt.Printf("o")
 			default:
 				panic(fmt.Sprintf("Error: title id %d is not recognized\n", tileID))
 			}
@@ -197,38 +198,73 @@ func updateGameBoard(drawInstructionsPtr *[3]int64, gameBoardPtr *[][]int, score
 	return &gameBoard, score
 }
 
-func getObjectX(gameBoardPtr *[][]int, tileID int) (int, bool) {
-	// Get Object's x coordinate
+func getObjectCoordinates(gameBoardPtr *[][]int, tileID int) (int, int, bool) {
+	// Get Object's x & y coordinates
 	gameBoard := *gameBoardPtr
 	for y := range gameBoard {
 		for x := range gameBoard[y] {
 			if gameBoard[y][x] == tileID {
-				return x, true
+				return x, y, true
 			}
 		}
 	}
-	return 0, false
+	return -1, -1, false
 }
 
-func getPaddleDirection(gameBoardPtr *[][]int) int {
-	// TODO: decide where to move the paddle, return -1 if left, 0 if no movement, 1 if right
-	ballX, ballFound := getObjectX(gameBoardPtr, 4)
-	paddleX, paddleFound := getObjectX(gameBoardPtr, 3)
-	if ballFound && paddleFound {
-		if ballX > paddleX {
+func getPaddleDirection(gameBoardPtr *[][]int, ballCoordinatesPtr, lastBallCoordinatesPtr *[2]int) int {
+	// TODO: decide where to move the paddle, in a more intelligent way
+	ballCoordinates := *ballCoordinatesPtr
+	lastBallCoordinates := *lastBallCoordinatesPtr
+	paddleX, _, paddleFound := getObjectCoordinates(gameBoardPtr, 3)
+	ballX := ballCoordinates[0]
+	ballY := ballCoordinates[1]
+	lastBallX := lastBallCoordinates[0]
+	vX := ballX - lastBallX
+	var projectedBallX int
+	if paddleFound && lastBallX != -1 {
+		// Predict where it will hit the paddle plane
+		projectedBallX = vX + ballX
+		if ballY == 21 {
+			projectedBallX = ballX
+		}
+		if projectedBallX < 1 {
+			projectedBallX = 1
+		} else if projectedBallX > 44 {
+			projectedBallX = 43
+		}
+
+		// move paddle towards projectedBallX
+		if paddleX < projectedBallX {
 			return 1
-		} else if ballX < paddleX {
+		} else if paddleX > projectedBallX {
 			return -1
 		}
 	}
 	return 0
 }
 
-func artificalInputController(cinput chan int64, gameBoardPtr *[][]int) {
-	for { // TODO: figure out how to make this better (it is slow and laggy, don't know when it will ask for input but input may be stale at that point)
-		in := int64(getPaddleDirection(gameBoardPtr))
+func artificalInput(cinput chan int64, gameBoardPtr *[][]int, ballCoordinatesPtr, lastBallCoordinatesPtr *[2]int) {
+	in := getPaddleDirection(gameBoardPtr, ballCoordinatesPtr, lastBallCoordinatesPtr)
+	go sendNewInput(cinput, int64(in))
+}
+
+func sendNewInput(cinput chan int64, in int64) {
+	select {
+	case cinput <- in:
+	default:
+		// Overwrites what's currently being sent
+		_ = <-cinput
 		cinput <- in
-		fmt.Printf("Inputted %d\n", in)
+	}
+}
+
+func artificalInputKeepAlive(cinput chan int64) {
+	for {
+		select {
+		case cinput <- int64(0):
+		default: // Does not overwrite what's currently being sent
+		}
+		time.Sleep(50 * time.Millisecond)
 	}
 }
 
@@ -239,25 +275,45 @@ func createController(cfirstinput, clastoutput, cfinished chan int64, ccontrolle
 	// Make game board
 	maxX := 45
 	maxY := 24
+	score := 0
+	frameCounter := 0
+	boardRendered := false
 	gameBoard := make([][]int, maxY)
 	for i := 0; i < maxY; i++ {
 		gameBoard[i] = make([]int, maxX)
 	}
 	gameBoardPtr := &gameBoard
-	score := 0
-	go artificalInputController(cfirstinput, gameBoardPtr)
+	lastBallCoordinates := [2]int{-1, -1}
+	ballCoordinates := [2]int{-1, -1}
+	go artificalInputKeepAlive(cfirstinput)
 	for {
 		select {
 		case lastOut := <-clastoutput:
 			drawInstructions[drawInstructionsIdx] = lastOut
 			drawInstructionsIdx++
 			if drawInstructionsIdx > 2 {
+				if drawInstructions[2] == 4 { // new ball tile
+					ballCoordinates[0] = int(drawInstructions[0])
+					ballCoordinates[1] = int(drawInstructions[1])
+					artificalInput(cfirstinput, gameBoardPtr, &ballCoordinates, &lastBallCoordinates)
+				} else if drawInstructions[2] == 0 { // new empty tile
+					ballX, ballY, ballFound := getObjectCoordinates(gameBoardPtr, 4)
+					if ballFound && ballX == int(drawInstructions[0]) && ballY == int(drawInstructions[1]) { // if ball is updated, update lastBallCoordinates
+						lastBallCoordinates[0] = ballX
+						lastBallCoordinates[1] = ballY
+					}
+				}
 				gameBoardPtr, score = updateGameBoard(&drawInstructions, gameBoardPtr, score)
-				// gameBoard = *gameBoardPtr
-				drawGameBoard(gameBoardPtr)
-				fmt.Printf("Score: %d\n", score)
+				if drawInstructions[0] == int64(maxX-1) && drawInstructions[1] == int64(maxY-1) {
+					boardRendered = true
+				}
+				if boardRendered {
+					frameCounter++
+					drawGameBoard(gameBoardPtr)
+					fmt.Printf("Score: %d | Frame: %d\n", score, frameCounter)
+					time.Sleep(10 * time.Millisecond)
+				}
 				drawInstructionsIdx = 0
-				time.Sleep(5 * time.Millisecond)
 			}
 		case computerFinished := <-cfinished:
 			fmt.Printf("Computer %d finished\n", computerFinished)
