@@ -55,3 +55,20 @@ func Test_UnitTest_parseInput(t *testing.T) {
 		t.Errorf("Expected result was:\n%+v\n actual result was:\n%+v\n", expectedResult, actualResult)
 	}
 }
+
+func Test_UnitTest_getOreUsedForFuel(t *testing.T) {
+	chemORE := chemical{name: "ORE", quantityCreated: 0, reactants: nil}
+	chemA := chemical{name: "A", quantityCreated: 10, reactants: []reactant{reactant{chemicalIdx: 0, quantityUsed: 10}}}
+	chemB := chemical{name: "B", quantityCreated: 1, reactants: []reactant{reactant{chemicalIdx: 0, quantityUsed: 1}}}
+	chemC := chemical{name: "C", quantityCreated: 1, reactants: []reactant{reactant{chemicalIdx: 1, quantityUsed: 7}, reactant{chemicalIdx: 2, quantityUsed: 1}}}
+	chemD := chemical{name: "D", quantityCreated: 1, reactants: []reactant{reactant{chemicalIdx: 1, quantityUsed: 7}, reactant{chemicalIdx: 3, quantityUsed: 1}}}
+	chemE := chemical{name: "E", quantityCreated: 1, reactants: []reactant{reactant{chemicalIdx: 1, quantityUsed: 7}, reactant{chemicalIdx: 4, quantityUsed: 1}}}
+	chemFUEL := chemical{name: "FUEL", quantityCreated: 1, reactants: []reactant{reactant{chemicalIdx: 1, quantityUsed: 7}, reactant{chemicalIdx: 5, quantityUsed: 1}}}
+	testChemicals := []chemical{chemORE, chemA, chemB, chemC, chemD, chemE, chemFUEL}
+
+	expectedResult := 31
+	actualResult := getOreUsedForFuel(&testChemicals)
+	if expectedResult != actualResult {
+		t.Errorf("Expected result was:\n%+v\n actual result was:\n%+v\n", expectedResult, actualResult)
+	}
+}

@@ -102,6 +102,11 @@ func parseInput(inputPtr *[]byte) *[]chemical {
 
 }
 
+func getOreUsedForFuel(chemicalsPtr *[]chemical) int {
+	// TODO: Implement
+	return 0
+}
+
 func main() {
 
 	start := time.Now()
@@ -112,8 +117,12 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	chemicals := parseInput(&input)
+	chemicals := *parseInput(&input)
 	fmt.Printf("Chemicals: %v\n", chemicals)
+
+	// Get total amount of ORE used to create FUEL
+	oreUsedForFuel := getOreUsedForFuel(&chemicals)
+	fmt.Printf("Ore used for fuel: %d\n", oreUsedForFuel)
 
 	elapsed := time.Since(start)
 	fmt.Printf("Program took %s\n", elapsed)
