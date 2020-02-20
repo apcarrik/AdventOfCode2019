@@ -98,3 +98,5 @@ func Test_UnitTest_getOreUsedForFuel(t *testing.T) {
 		t.Errorf("Expected result was:\n%+v\n actual result was:\n%+v\n", expectedResult, actualResult)
 	}
 }
+
+// TODO: add e2e tests with files
