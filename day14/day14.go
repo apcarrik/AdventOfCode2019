@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
+	"math"
 	"regexp"
 	"strconv"
 	"time"
@@ -18,7 +19,9 @@ type reactant struct {
 
 type chemical struct { // TODO: should this be a map?
 	name            string
+	reactionYeild   int
 	quantityCreated int
+	quantityExtra   int
 	reactants       []reactant
 }
 
@@ -31,7 +34,7 @@ func addChemical(chemicalName string, chemicalsPtr *[]chemical) *[]chemical {
 	cIdx := findChemicalIndex(&chemicals, chemicalName)
 	if cIdx == -1 {
 		// Chemical is new - need to add w/ default values
-		chemicals = append(chemicals, chemical{name: chemicalName, quantityCreated: 0, reactants: nil})
+		chemicals = append(chemicals, chemical{name: chemicalName})
 	}
 	return &chemicals
 }
@@ -68,7 +71,7 @@ func parseInput(inputPtr *[]byte) *[]chemical {
 	for _, line := range inputLines {
 		reactionChemicals := re.FindAllSubmatch(line, -1)
 		outputChemicalName := string(reactionChemicals[len(reactionChemicals)-1][2])
-		outputChemicalQuantityCreated, err := strconv.Atoi(string(reactionChemicals[len(reactionChemicals)-1][1]))
+		outputChemicalYeild, err := strconv.Atoi(string(reactionChemicals[len(reactionChemicals)-1][1]))
 		if err != nil {
 			panic(err)
 		}
@@ -76,12 +79,12 @@ func parseInput(inputPtr *[]byte) *[]chemical {
 		if outputChemicalIdx == -1 {
 			panic(fmt.Errorf("error: Chemical %s not found", outputChemicalName))
 		}
-		chemicals[outputChemicalIdx].quantityCreated = outputChemicalQuantityCreated
+		chemicals[outputChemicalIdx].reactionYeild = outputChemicalYeild
 		// update reactants
 		for i := range reactionChemicals {
 			if i < (len(reactionChemicals) - 1) {
 				chemicalName := string(reactionChemicals[i][2])
-				chemicalQuantityCreated, err := strconv.Atoi(string(reactionChemicals[i][1]))
+				chemicalQuantityUsed, err := strconv.Atoi(string(reactionChemicals[i][1]))
 				if err != nil {
 					panic(err)
 				}
@@ -91,7 +94,7 @@ func parseInput(inputPtr *[]byte) *[]chemical {
 				}
 				chemicals[outputChemicalIdx].reactants = append(chemicals[outputChemicalIdx].reactants, reactant{
 					chemicalIdx:  chemicalIdx,
-					quantityUsed: chemicalQuantityCreated,
+					quantityUsed: chemicalQuantityUsed,
 				})
 			}
 		}
@@ -102,9 +105,35 @@ func parseInput(inputPtr *[]byte) *[]chemical {
 
 }
 
+func getChemicalRequired(chemicalsPtr *[]chemical, chemicalIdx int, amountRequired int) *[]chemical {
+	chemicals := *chemicalsPtr
+	amountRequiredToMake := (amountRequired - chemicals[chemicalIdx].quantityExtra)
+	yeild := chemicals[chemicalIdx].reactionYeild
+	if yeild == 0 {
+		yeild = 1
+	}
+	if amountRequiredToMake > 0 {
+		reactionMultiplier := int(math.Ceil(float64(amountRequiredToMake) / float64(yeild)))
+		// need to make more of output - look at reactants
+		for _, reactant := range chemicals[chemicalIdx].reactants {
+			// get amount of each reactant
+			amountOfReactantRequired := reactant.quantityUsed * reactionMultiplier
+			chemicalsPtr = getChemicalRequired(&chemicals, reactant.chemicalIdx, amountOfReactantRequired)
+			chemicals = *chemicalsPtr
+		}
+		// need to update the amount of this chemical that is used & extra
+		chemicals[chemicalIdx].quantityCreated += (yeild * reactionMultiplier)
+		chemicals[chemicalIdx].quantityExtra = (yeild * reactionMultiplier) - amountRequiredToMake
+	} else {
+		chemicals[chemicalIdx].quantityExtra -= amountRequired
+	}
+	return &chemicals
+
+}
+
 func getOreUsedForFuel(chemicalsPtr *[]chemical) int {
-	// TODO: Implement
-	return 0
+	chemicalsPtr = getChemicalRequired(chemicalsPtr, findChemicalIndex(chemicalsPtr, "FUEL"), 1)
+	return (*chemicalsPtr)[findChemicalIndex(chemicalsPtr, "ORE")].quantityCreated
 }
 
 func main() {
@@ -123,6 +152,7 @@ func main() {
 	// Get total amount of ORE used to create FUEL
 	oreUsedForFuel := getOreUsedForFuel(&chemicals)
 	fmt.Printf("Ore used for fuel: %d\n", oreUsedForFuel)
+	fmt.Printf("Chemicals: %v\n", chemicals)
 
 	elapsed := time.Since(start)
 	fmt.Printf("Program took %s\n", elapsed)
