@@ -139,7 +139,7 @@ func getOreUsedForFuel(chemicalsPtr *[]chemical) int {
 func main() {
 
 	start := time.Now()
-	inputFile := "input/input2.txt"
+	inputFile := "input/input.txt"
 
 	// Get moons from input file
 	input, err := ioutil.ReadFile(inputFile)
