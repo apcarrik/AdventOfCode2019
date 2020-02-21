@@ -99,6 +99,14 @@ func Test_UnitTest_getOreUsedForFuel(t *testing.T) {
 	}
 }
 
+func Test_EndToEnd_input(t *testing.T) {
+	expectedResult := 654909
+	actualResult := part1("input/input.txt")
+	if expectedResult != actualResult {
+		t.Errorf("Expected result was:\n%+v\n actual result was:\n%+v\n", expectedResult, actualResult)
+	}
+}
+
 func Test_EndToEnd_input2(t *testing.T) {
 	expectedResult := 31
 	actualResult := part1("input/input2.txt")
