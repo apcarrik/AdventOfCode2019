@@ -100,3 +100,39 @@ func Test_UnitTest_getOreUsedForFuel(t *testing.T) {
 }
 
 // TODO: add e2e tests with files
+
+func Test_EndToEnd_input2(t *testing.T) {
+	expectedResult := 31
+	actualResult := part1("input/input2.txt")
+	if expectedResult != actualResult {
+		t.Errorf("Expected result was:\n%+v\n actual result was:\n%+v\n", expectedResult, actualResult)
+	}
+}
+func Test_EndToEnd_input3(t *testing.T) {
+	expectedResult := 165
+	actualResult := part1("input/input3.txt")
+	if expectedResult != actualResult {
+		t.Errorf("Expected result was:\n%+v\n actual result was:\n%+v\n", expectedResult, actualResult)
+	}
+}
+func Test_EndToEnd_input4(t *testing.T) {
+	expectedResult := 13312
+	actualResult := part1("input/input4.txt")
+	if expectedResult != actualResult {
+		t.Errorf("Expected result was:\n%+v\n actual result was:\n%+v\n", expectedResult, actualResult)
+	}
+}
+func Test_EndToEnd_input5(t *testing.T) {
+	expectedResult := 180697
+	actualResult := part1("input/input5.txt")
+	if expectedResult != actualResult {
+		t.Errorf("Expected result was:\n%+v\n actual result was:\n%+v\n", expectedResult, actualResult)
+	}
+}
+func Test_EndToEnd_input6(t *testing.T) {
+	expectedResult := 2210736
+	actualResult := part1("input/input6.txt")
+	if expectedResult != actualResult {
+		t.Errorf("Expected result was:\n%+v\n actual result was:\n%+v\n", expectedResult, actualResult)
+	}
+}
