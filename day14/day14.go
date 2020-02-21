@@ -136,23 +136,27 @@ func getOreUsedForFuel(chemicalsPtr *[]chemical) int {
 	return (*chemicalsPtr)[findChemicalIndex(chemicalsPtr, "ORE")].quantityCreated
 }
 
-func main() {
-
-	start := time.Now()
-	inputFile := "input/input.txt"
-
+func part1(inputFile string) int {
 	// Get moons from input file
 	input, err := ioutil.ReadFile(inputFile)
 	if err != nil {
 		panic(err)
 	}
 	chemicals := *parseInput(&input)
-	fmt.Printf("Chemicals: %v\n", chemicals)
 
 	// Get total amount of ORE used to create FUEL
-	oreUsedForFuel := getOreUsedForFuel(&chemicals)
+	return getOreUsedForFuel(&chemicals)
+}
+
+func main() {
+	start := time.Now()
+	inputFile := "input/input.txt"
+
+	// Part 1
+	oreUsedForFuel := part1(inputFile)
 	fmt.Printf("Ore used for fuel: %d\n", oreUsedForFuel)
-	fmt.Printf("Chemicals: %v\n", chemicals)
+
+	// TODO: Part 2
 
 	elapsed := time.Since(start)
 	fmt.Printf("Program took %s\n", elapsed)
