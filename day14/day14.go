@@ -131,8 +131,8 @@ func getChemicalRequired(chemicalsPtr *[]chemical, chemicalIdx int, amountRequir
 
 }
 
-func getOreUsedForFuel(chemicalsPtr *[]chemical) int {
-	chemicalsPtr = getChemicalRequired(chemicalsPtr, findChemicalIndex(chemicalsPtr, "FUEL"), 1)
+func getOreUsedForFuel(chemicalsPtr *[]chemical, amountOfFuel int) int {
+	chemicalsPtr = getChemicalRequired(chemicalsPtr, findChemicalIndex(chemicalsPtr, "FUEL"), amountOfFuel)
 	return (*chemicalsPtr)[findChemicalIndex(chemicalsPtr, "ORE")].quantityCreated
 }
 
@@ -145,7 +145,22 @@ func part1(inputFile string) int {
 	chemicals := *parseInput(&input)
 
 	// Get total amount of ORE used to create FUEL
-	return getOreUsedForFuel(&chemicals)
+	return getOreUsedForFuel(&chemicals, 1)
+}
+
+func part2(inputFile string) int {
+	// Get moons from input file
+	input, err := ioutil.ReadFile(inputFile)
+	if err != nil {
+		panic(err)
+	}
+	chemicals := *parseInput(&input)
+
+	// TODO: figure out how to iterate the fuel use to find the right amount of ore
+	amountOfFuel := 1
+	// Get total amount of ORE used to create FUEL
+	return getOreUsedForFuel(&chemicals, amountOfFuel)
+
 }
 
 func main() {
@@ -156,7 +171,9 @@ func main() {
 	oreUsedForFuel := part1(inputFile)
 	fmt.Printf("Ore used for fuel: %d\n", oreUsedForFuel)
 
-	// TODO: Part 2
+	// Part 2
+	fuelWithOneTrillionOre := part2(inputFile)
+	fmt.Printf("Amount of fuel created with one trillion ore: %d\n", fuelForOneTrillionOre)
 
 	elapsed := time.Since(start)
 	fmt.Printf("Program took %s\n", elapsed)

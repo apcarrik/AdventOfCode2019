@@ -93,7 +93,7 @@ func Test_UnitTest_getOreUsedForFuel(t *testing.T) {
 	testChemicals := []chemical{chemORE, chemA, chemB, chemC, chemD, chemE, chemFUEL}
 
 	expectedResult := 31
-	actualResult := getOreUsedForFuel(&testChemicals)
+	actualResult := getOreUsedForFuel(&testChemicals, 1)
 	if expectedResult != actualResult {
 		t.Errorf("Expected result was:\n%+v\n actual result was:\n%+v\n", expectedResult, actualResult)
 	}
