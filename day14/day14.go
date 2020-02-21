@@ -156,10 +156,23 @@ func part2(inputFile string) int {
 	}
 	chemicals := *parseInput(&input)
 
-	// TODO: figure out how to iterate the fuel use to find the right amount of ore
+	// Starting with 1, iterate the amount of fuel created until you get close to 1 billion ORE used
 	amountOfFuel := 1
-	// Get total amount of ORE used to create FUEL
-	return getOreUsedForFuel(&chemicals, amountOfFuel)
+	oreUsed := getOreUsedForFuel(&chemicals, amountOfFuel)
+	for oreUsed != 1000000000000 {
+		chemicals = *parseInput(&input)
+		if oreUsed < 1000000000000 {
+			oldAmountOfFuel := amountOfFuel
+			amountOfFuel = int(float32(1000000000000) / float32(oreUsed) * float32(oldAmountOfFuel))
+			if amountOfFuel == oldAmountOfFuel {
+				amountOfFuel++
+			}
+		} else if oreUsed > 1000000000000 {
+			return amountOfFuel - 1
+		}
+		oreUsed = getOreUsedForFuel(&chemicals, amountOfFuel)
+	}
+	return amountOfFuel
 
 }
 
@@ -173,7 +186,7 @@ func main() {
 
 	// Part 2
 	fuelWithOneTrillionOre := part2(inputFile)
-	fmt.Printf("Amount of fuel created with one trillion ore: %d\n", fuelForOneTrillionOre)
+	fmt.Printf("Amount of fuel created with one trillion ore: %d\n", fuelWithOneTrillionOre)
 
 	elapsed := time.Since(start)
 	fmt.Printf("Program took %s\n", elapsed)

@@ -100,49 +100,69 @@ func Test_UnitTest_getOreUsedForFuel(t *testing.T) {
 }
 
 func Test_EndToEnd_input(t *testing.T) {
-	expectedResult := 654909
-	actualResult := part1("input/input.txt")
-	if expectedResult != actualResult {
-		t.Errorf("Expected result was:\n%+v\n actual result was:\n%+v\n", expectedResult, actualResult)
+	part1ExpectedResult := 654909
+	part1ActualResult := part1("input/input.txt")
+	if part1ExpectedResult != part1ActualResult {
+		t.Errorf("Expected result was:\n%+v\n actual result was:\n%+v\n", part1ExpectedResult, part1ActualResult)
+	}
+	part2ExpectedResult := 2876992
+	part2ActualResult := part2("input/input.txt")
+	if part2ExpectedResult != part2ActualResult {
+		t.Errorf("Expected result was:\n%+v\n actual result was:\n%+v\n", part2ExpectedResult, part2ActualResult)
 	}
 }
 
 func Test_EndToEnd_input2(t *testing.T) {
-	expectedResult := 31
-	actualResult := part1("input/input2.txt")
-	if expectedResult != actualResult {
-		t.Errorf("Expected result was:\n%+v\n actual result was:\n%+v\n", expectedResult, actualResult)
+	part1ExpectedResult := 31
+	part1ActualResult := part1("input/input2.txt")
+	if part1ExpectedResult != part1ActualResult {
+		t.Errorf("Expected result was:\n%+v\n actual result was:\n%+v\n", part1ExpectedResult, part1ActualResult)
 	}
 }
 
 func Test_EndToEnd_input3(t *testing.T) {
-	expectedResult := 165
-	actualResult := part1("input/input3.txt")
-	if expectedResult != actualResult {
-		t.Errorf("Expected result was:\n%+v\n actual result was:\n%+v\n", expectedResult, actualResult)
+	part1ExpectedResult := 165
+	part1ActualResult := part1("input/input3.txt")
+	if part1ExpectedResult != part1ActualResult {
+		t.Errorf("Expected result was:\n%+v\n actual result was:\n%+v\n", part1ExpectedResult, part1ActualResult)
 	}
 }
 
 func Test_EndToEnd_input4(t *testing.T) {
-	expectedResult := 13312
-	actualResult := part1("input/input4.txt")
-	if expectedResult != actualResult {
-		t.Errorf("Expected result was:\n%+v\n actual result was:\n%+v\n", expectedResult, actualResult)
+	part1ExpectedResult := 13312
+	part1ActualResult := part1("input/input4.txt")
+	if part1ExpectedResult != part1ActualResult {
+		t.Errorf("Expected result was:\n%+v\n actual result was:\n%+v\n", part1ExpectedResult, part1ActualResult)
+	}
+	part2ExpectedResult := 82892753
+	part2ActualResult := part2("input/input4.txt")
+	if part2ExpectedResult != part2ActualResult {
+		t.Errorf("Expected result was:\n%+v\n actual result was:\n%+v\n", part2ExpectedResult, part2ActualResult)
 	}
 }
 
 func Test_EndToEnd_input5(t *testing.T) {
-	expectedResult := 180697
-	actualResult := part1("input/input5.txt")
-	if expectedResult != actualResult {
-		t.Errorf("Expected result was:\n%+v\n actual result was:\n%+v\n", expectedResult, actualResult)
+	part1ExpectedResult := 180697
+	part1ActualResult := part1("input/input5.txt")
+	if part1ExpectedResult != part1ActualResult {
+		t.Errorf("Expected result was:\n%+v\n actual result was:\n%+v\n", part1ExpectedResult, part1ActualResult)
+	}
+	part2ExpectedResult := 5586022
+	part2ActualResult := part2("input/input5.txt")
+	if part2ExpectedResult != part2ActualResult {
+		t.Errorf("Expected result was:\n%+v\n actual result was:\n%+v\n", part2ExpectedResult, part2ActualResult)
 	}
 }
 
 func Test_EndToEnd_input6(t *testing.T) {
-	expectedResult := 2210736
-	actualResult := part1("input/input6.txt")
-	if expectedResult != actualResult {
-		t.Errorf("Expected result was:\n%+v\n actual result was:\n%+v\n", expectedResult, actualResult)
+	part1ExpectedResult := 2210736
+	part1ActualResult := part1("input/input6.txt")
+	if part1ExpectedResult != part1ActualResult {
+		t.Errorf("Expected result was:\n%+v\n actual result was:\n%+v\n", part1ExpectedResult, part1ActualResult)
+	}
+	part2ExpectedResult := 460664
+	part2ActualResult := part2("input/input6.txt")
+	if part2ExpectedResult != part2ActualResult {
+		t.Errorf("Expected result was:\n%+v\n actual result was:\n%+v\n", part2ExpectedResult, part2ActualResult)
 	}
 }
